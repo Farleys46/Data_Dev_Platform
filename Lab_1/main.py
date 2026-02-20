@@ -10,8 +10,8 @@ dirty_products = pd.read_csv("Lab_1/lab1_products.csv", sep=";")
 ##### Cleaning the CSV file #####
 #################################
 
-# Replace all ";" with "," in the DataFrame to make it CSV compliant.
-dirty_products = dirty_products.replace(";", ",", regex=True)
+# Replace all ";" with "," in the DataFrame to make it look more like CSV file. 
+dirty_products = dirty_products.replace(";", ",", regex=False)
 
 
 # Remove whitespaces from the "name" and "currency" columns.
@@ -23,10 +23,20 @@ dirty_products["currency"] = dirty_products["currency"].str.strip()
 
 dirty_products["price"] = pd.to_numeric(dirty_products["price"], errors="coerce")
 
-# Flag products with missing values in any of the columns or with price less than 0 or greater than 40000.
-columns = ["id", "name", "price", "currency", "created_at"]
-dirty_products["is_flagged"] = dirty_products[columns].isna().any(axis=1)|(dirty_products["price"] < 0)|(dirty_products["price"] > 40000)
+# Clean the "created_at" column by converting it to datetime format. And replace "/" with "-".
+dirty_products["created_at"] = dirty_products["created_at"].str.replace("/", "-", regex=False)
+dirty_products["created_at"] = pd.to_datetime(dirty_products["created_at"], errors="coerce")
 
+
+# Flag products with missing values in any of the columns except "id", or with price less than 0 or greater than 40000.
+columns = ["name", "price", "currency", "created_at"]
+
+dirty_products["flag_missing_values"] = dirty_products[columns].isna().any(axis=1)
+dirty_products["flag_high_price"] = dirty_products["price"] > 40000
+dirty_products["flag_zero_price"] = dirty_products["price"] == 0
+
+# Reject impossible values:
+impossible_values = (dirty_products["price"] < 0) | (dirty_products["id"].isna()) 
 
 
 print(dirty_products)
@@ -35,4 +45,5 @@ print(dirty_products)
 
 # Check if data type has changed to float. 
 print(dirty_products["price"].dtype)
+print(dirty_products["created_at"].dtype)
 

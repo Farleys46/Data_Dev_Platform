@@ -28,6 +28,11 @@ dirty_products["created_at"] = dirty_products["created_at"].str.replace("/", "-"
 dirty_products["created_at"] = pd.to_datetime(dirty_products["created_at"], errors="coerce")
 
 
+################################
+#### Flagging and rejecting ####
+################################
+
+
 # Flag products with missing values in any of the columns except "id", or with price less than 0 or greater than 40000.
 columns = ["name", "price", "currency", "created_at"]
 
@@ -39,11 +44,54 @@ dirty_products["flag_zero_price"] = dirty_products["price"] == 0
 impossible_values = (dirty_products["price"] < 0) | (dirty_products["id"].isna()) 
 
 
-print(dirty_products)
-
 #print(dirty_products.info())
 
 # Check if data type has changed to float. 
 print(dirty_products["price"].dtype)
 print(dirty_products["created_at"].dtype)
 
+# Save rejected rows to a new CSV file called "rejected_products.csv".
+rejected_products = dirty_products[impossible_values]
+rejected_products.to_csv("Lab_1/rejected_products.csv", index=False)
+
+
+# Save cleaned data to a new DataFrame called "cleaned_products" and rejecting impossible values.
+cleaned_products = dirty_products[~impossible_values]
+
+
+####################################
+##### Analytics and Bonus task #####
+####################################
+
+mean_price = cleaned_products["price"].mean()
+median_price = cleaned_products["price"].median()
+amount_of_products = len(cleaned_products)    
+missing_price = cleaned_products["price"].isna().sum()
+
+analytics_df = pd.DataFrame({
+    "mean_price": [mean_price],
+    "median_price": [median_price],
+    "amount_of_products": [amount_of_products],
+    "missing_price": [missing_price]
+})
+
+# Save the analytics summary to a new CSV file called "analytics_summary.csv".
+analytics_df.to_csv("Lab_1/analytics_summary.csv", index=False)
+
+
+
+top_10_expensive_products = cleaned_products.nlargest(10, "price")
+
+
+
+
+top_10_df = pd.DataFrame({
+    "top_10_expensive_products": top_10_expensive_products
+})
+
+# Save the top 10 expensive and least expensive products to a new CSV file called "top_10_products.csv".
+top_10_df.to_csv("Lab_1/price_analysis.csv", index=False)
+
+print(cleaned_products)
+print(amount_of_products)
+print(top_10_expensive_products)

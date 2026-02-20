@@ -1,0 +1,4 @@
+id,name,price,currency,created_at,flag_missing_values,flag_high_price,flag_zero_price
+,jacket,-200.0,SEK,,True,False,False
+,hat,,SEK,,True,False,False
+SKU-1015,hoodie,-50.0,SEK,2024-04-15,False,False,False

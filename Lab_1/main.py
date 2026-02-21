@@ -1,6 +1,5 @@
 # Import necessary libraries
 import pandas as pd
-import json
 
 # Load the CSV file using Pandas. And tell it that the separator is ";" and not ",".
 dirty_products = pd.read_csv("Lab_1/lab1_products.csv", sep=";")
@@ -20,7 +19,6 @@ dirty_products["currency"] = dirty_products["currency"].str.strip()
 
 
 # Change data type for "price" column to float instead of string.
-
 dirty_products["price"] = pd.to_numeric(dirty_products["price"], errors="coerce")
 
 # Clean the "created_at" column by converting it to datetime format. And replace "/" with "-".
@@ -63,8 +61,8 @@ cleaned_products = dirty_products[~impossible_values]
 ##### Analytics and Bonus task #####
 ####################################
 
-mean_price = cleaned_products["price"].mean()
-median_price = cleaned_products["price"].median()
+mean_price = round(cleaned_products["price"].mean(), 2)
+median_price = round(cleaned_products["price"].median(), 2)
 amount_of_products = len(cleaned_products)    
 missing_price = cleaned_products["price"].isna().sum()
 
@@ -79,19 +77,5 @@ analytics_df = pd.DataFrame({
 analytics_df.to_csv("Lab_1/analytics_summary.csv", index=False)
 
 
-
-top_10_expensive_products = cleaned_products.nlargest(10, "price")
-
-
-
-
-top_10_df = pd.DataFrame({
-    "top_10_expensive_products": top_10_expensive_products
-})
-
-# Save the top 10 expensive and least expensive products to a new CSV file called "top_10_products.csv".
-top_10_df.to_csv("Lab_1/price_analysis.csv", index=False)
-
 print(cleaned_products)
 print(amount_of_products)
-print(top_10_expensive_products)
